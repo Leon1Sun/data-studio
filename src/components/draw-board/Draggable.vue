@@ -1,55 +1,60 @@
 <template>
   <div
     class="draggable"
-    :style="{top:position.y+ 'px',left:position.x+ 'px',width:position.width + 'px',height:position.height + 'px'}"
+    :style="{
+			top: position.y + 'px',
+			left: position.x + 'px',
+			width: position.width + 'px',
+			height: position.height + 'px'
+		}"
     @mousedown="e => drag(e)"
   >
     <div
       class="cursor cursor-left-top"
       style="cursor:nw-resize"
-      @mousedown.stop="e => scale(e,'left','top')"
+      @mousedown.stop="e => scale(e, 'left', 'top')"
     ></div>
     <div
       class="cursor cursor-center-top"
       style="cursor:n-resize"
-      @mousedown.stop="e => scale(e,'center','top')"
+      @mousedown.stop="e => scale(e, 'center', 'top')"
     ></div>
     <div
       class="cursor cursor-right-top"
       style="cursor:ne-resize"
-      @mousedown.stop="e => scale(e,'right','top')"
+      @mousedown.stop="e => scale(e, 'right', 'top')"
     ></div>
 
     <div
       class="cursor cursor-left-middle"
       style="cursor:w-resize"
-      @mousedown.stop="e => scale(e,'left','middle')"
+      @mousedown.stop="e => scale(e, 'left', 'middle')"
     ></div>
     <div
       class="cursor cursor-right-middle"
       style="cursor:e-resize"
-      @mousedown.stop="e => scale(e,'right','middle')"
+      @mousedown.stop="e => scale(e, 'right', 'middle')"
     ></div>
 
     <div
       class="cursor cursor-left-bottom"
       style="cursor:sw-resize"
-      @mousedown.stop="e => scale(e,'left','bottom')"
+      @mousedown.stop="e => scale(e, 'left', 'bottom')"
     ></div>
     <div
       class="cursor cursor-center-bottom"
       style="cursor:s-resize"
-      @mousedown.stop="e => scale(e,'center','bottom')"
+      @mousedown.stop="e => scale(e, 'center', 'bottom')"
     ></div>
     <div
       class="cursor cursor-right-bottom"
       style="cursor:se-resize"
-      @mousedown.stop="e => scale(e,'right','bottom')"
+      @mousedown.stop="e => scale(e, 'right', 'bottom')"
     ></div>
   </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { Rectangle, Point, Offset } from ".";
 import * as _ from "lodash";
@@ -95,8 +100,8 @@ export default class DraggableItem extends Vue {
     this.position = new Rectangle(10, 10, 100, 150);
     this.dragFlag = 0;
   }
-  mounted() {}
-  destroyed() {}
+  mounted() { }
+  destroyed() { }
   protected onDrag(offset: Offset) {
     if (this.last_point) {
       const x = offset.x - this.last_point.x;
@@ -191,7 +196,7 @@ export default class DraggableItem extends Vue {
   }
 }
 </script>
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .draggable {
   position: absolute;
   min-width: 10px;
@@ -224,4 +229,3 @@ export default class DraggableItem extends Vue {
   }
 }
 </style>
-
