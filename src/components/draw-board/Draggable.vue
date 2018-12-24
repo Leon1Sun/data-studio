@@ -55,20 +55,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import { Rectangle, Point, Offset } from ".";
-import * as _ from "lodash";
-type Horizon = "left" | "center" | "right";
-type Vertical = "top" | "middle" | "bottom";
-type ScaleDirect = {
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Rectangle, Point, Offset } from '.';
+import * as _ from 'lodash';
+type Horizon = 'left' | 'center' | 'right';
+type Vertical = 'top' | 'middle' | 'bottom';
+interface ScaleDirect {
   h: Horizon;
   v: Vertical;
-};
+}
 
 function getOffset(event: MouseEvent, parent: Element): Offset {
-  let offset = {
+  const offset = {
     x: event.offsetX,
-    y: event.offsetY
+    y: event.offsetY,
   };
   let el: HTMLElement | null = event.target as HTMLElement;
   while (el && el !== parent) {
@@ -79,13 +79,12 @@ function getOffset(event: MouseEvent, parent: Element): Offset {
   return offset;
 }
 @Component({
-  components: {}
+  components: {},
 })
 export default class DraggableItem extends Vue {
   @Prop({ default: false, type: Boolean })
   public edit: boolean = false;
 
-  protected position: Rectangle;
   /**
    * 0 : nothing
    * 1 : scale
@@ -93,89 +92,34 @@ export default class DraggableItem extends Vue {
    */
   public dragFlag: 0 | 1 | 2;
   public scaleDirect: ScaleDirect | undefined;
-  private last_position: Rectangle | undefined;
-  private last_point: Point | undefined;
+
+  protected position: Rectangle;
+
+  private $lastPosition: Rectangle | undefined;
+  private $lastPoint: Point | undefined;
   constructor() {
     super();
     this.position = new Rectangle(10, 10, 100, 150);
     this.dragFlag = 0;
   }
-  mounted() { }
-  destroyed() { }
-  protected onDrag(offset: Offset) {
-    if (this.last_point) {
-      const x = offset.x - this.last_point.x;
-      const y = offset.y - this.last_point.y;
-      this.position.x += x;
-      this.position.y += y;
-      this.last_point = offset;
-    }
-  }
-  protected onScale(offset: Offset) {
-    if (!this.scaleDirect) {
-      return;
-    }
-    const x = offset.x;
-    const y = offset.y;
-    // horizon
-    if (this.scaleDirect.h == "right") {
-      this.position.width = x - this.position.x;
-    } else if (this.scaleDirect.h == "left") {
-      const newWidth = this.position.width - (x - this.position.x);
-      if (newWidth <= 10) {
-        if (this.last_position) {
-          const maxX = this.last_position.x + this.last_position.width - 10;
-          this.position.x = maxX;
-          this.position.width = 10;
-        } else {
-          this.position.x +=
-            this.position.width < 10 ? 0 : Math.abs(this.position.width - 10);
-          this.position.width = 10;
-        }
-      } else {
-        this.position.x = x;
-        this.position.width = newWidth;
-      }
-    }
-    // vertical
-    if (this.scaleDirect.v == "bottom") {
-      this.position.height = y - this.position.y;
-    } else if (this.scaleDirect.v == "top") {
-      const newHeight = this.position.height - (y - this.position.y);
-      if (newHeight <= 20) {
-        if (this.last_position) {
-          const maxY = this.last_position.y + this.last_position.height - 20;
-          this.position.y = maxY;
-          this.position.height = 20;
-        } else {
-          this.position.y +=
-            this.position.height < 20 ? 0 : Math.abs(this.position.height - 20);
-          this.position.height = 20;
-        }
-      } else {
-        this.position.y = y;
-        this.position.height = newHeight;
-      }
-    }
-  }
   public drag(e: MouseEvent) {
     this.dragFlag = 2;
-    this.last_point = getOffset(e, this.$parent.$el);
+    this.$lastPoint = getOffset(e, this.$parent.$el);
   }
   public scale(e: MouseEvent, horizon: Horizon, vertical: Vertical) {
     e.preventDefault();
     this.dragFlag = 1;
     this.scaleDirect = {
       h: horizon,
-      v: vertical
+      v: vertical,
     };
-    this.last_position = _.clone(this.position);
+    this.$lastPosition = _.clone(this.position);
   }
   public onMouseMove(e: MouseEvent) {
-    let offset = getOffset(e, this.$parent.$el);
+    const offset = getOffset(e, this.$parent.$el);
     if (!this.dragFlag) {
       return;
-    } else if (this.dragFlag == 1) {
+    } else if (this.dragFlag === 1) {
       if (!this.scaleDirect) {
         return;
       }
@@ -194,6 +138,63 @@ export default class DraggableItem extends Vue {
   public getPosition() {
     return this.position;
   }
+  protected onDrag(offset: Offset) {
+    if (this.$lastPoint) {
+      const x = offset.x - this.$lastPoint.x;
+      const y = offset.y - this.$lastPoint.y;
+      this.position.x += x;
+      this.position.y += y;
+      this.$lastPoint = offset;
+    }
+  }
+  protected onScale(offset: Offset) {
+    if (!this.scaleDirect) {
+      return;
+    }
+    const x = offset.x;
+    const y = offset.y;
+    // horizon
+    if (this.scaleDirect.h === 'right') {
+      this.position.width = x - this.position.x;
+    } else if (this.scaleDirect.h === 'left') {
+      const newWidth = this.position.width - (x - this.position.x);
+      if (newWidth <= 10) {
+        if (this.$lastPosition) {
+          const maxX = this.$lastPosition.x + this.$lastPosition.width - 10;
+          this.position.x = maxX;
+          this.position.width = 10;
+        } else {
+          this.position.x +=
+            this.position.width < 10 ? 0 : Math.abs(this.position.width - 10);
+          this.position.width = 10;
+        }
+      } else {
+        this.position.x = x;
+        this.position.width = newWidth;
+      }
+    }
+    // vertical
+    if (this.scaleDirect.v === 'bottom') {
+      this.position.height = y - this.position.y;
+    } else if (this.scaleDirect.v === 'top') {
+      const newHeight = this.position.height - (y - this.position.y);
+      if (newHeight <= 20) {
+        if (this.$lastPosition) {
+          const maxY = this.$lastPosition.y + this.$lastPosition.height - 20;
+          this.position.y = maxY;
+          this.position.height = 20;
+        } else {
+          this.position.y +=
+            this.position.height < 20 ? 0 : Math.abs(this.position.height - 20);
+          this.position.height = 20;
+        }
+      } else {
+        this.position.y = y;
+        this.position.height = newHeight;
+      }
+    }
+  }
+
 }
 </script>
 <style lang="scss" scoped>

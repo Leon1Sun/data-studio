@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "element-ui": "^2.4.11",
     "loadsh": "0.0.3",
     "lodash": "^4.17.11",
     "node-sass": "^4.11.0",
